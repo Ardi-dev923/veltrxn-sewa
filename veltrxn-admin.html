@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Veltrxn Admin</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Rajdhani:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{--cyan:#00cfff;--green:#00cf78;--red:#ff6464;--yellow:#ffc846;--bg:#020408;--card:rgba(255,255,255,0.02);--border:rgba(0,200,255,0.15);}
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{min-height:100vh;background:var(--bg);font-family:'Rajdhani',sans-serif;color:#fff;}
+  #loginScreen{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;}
+  .login-card{width:100%;max-width:380px;background:var(--card);border:1px solid var(--border);border-radius:24px;padding:48px 36px;text-align:center;position:relative;overflow:hidden;}
+  .login-card::before{content:'';position:absolute;top:-100px;left:50%;transform:translateX(-50%);width:300px;height:300px;background:radial-gradient(circle,rgba(0,180,255,0.12) 0%,transparent 70%);pointer-events:none;}
+  .login-bolt{font-size:48px;filter:drop-shadow(0 0 14px var(--cyan));display:block;margin-bottom:8px;}
+  .login-title{font-family:'Orbitron',monospace;font-size:22px;font-weight:900;color:#fff;letter-spacing:3px;}
+  .login-title span{color:var(--cyan);}
+  .login-sub{font-size:13px;color:rgba(255,255,255,0.35);letter-spacing:4px;margin-top:6px;margin-bottom:32px;}
+  .login-input{width:100%;padding:14px 18px;background:rgba(255,255,255,0.04);border:1px solid rgba(0,200,255,0.2);border-radius:12px;color:#fff;font-family:'Rajdhani',sans-serif;font-size:18px;font-weight:600;outline:none;text-align:center;letter-spacing:4px;margin-bottom:14px;transition:border-color 0.2s;}
+  .login-input:focus{border-color:var(--cyan);}
+  .login-btn{width:100%;padding:16px;background:linear-gradient(135deg,var(--cyan),#0099cc);border:none;border-radius:12px;font-family:'Orbitron',monospace;font-size:14px;font-weight:700;color:#000;letter-spacing:2px;cursor:pointer;transition:transform 0.15s,box-shadow 0.15s;box-shadow:0 4px 20px rgba(0,200,255,0.3);}
+  .login-btn:hover{transform:translateY(-2px);box-shadow:0 8px 28px rgba(0,200,255,0.4);}
+  .login-err{color:var(--red);font-size:13px;margin-top:12px;display:none;}
+  #dashboard{display:none;padding:0 0 60px;}
+  .topbar{background:rgba(0,0,0,0.6);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);padding:18px 28px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;}
+  .topbar-title{font-family:'Orbitron',monospace;font-size:18px;font-weight:900;color:#fff;letter-spacing:2px;}
+  .topbar-title span{color:var(--cyan);}
+  .btn-refresh{padding:8px 16px;background:rgba(0,200,255,0.08);border:1px solid rgba(0,200,255,0.3);border-radius:8px;color:var(--cyan);font-family:'Rajdhani',sans-serif;font-size:14px;font-weight:700;cursor:pointer;margin-right:8px;}
+  .btn-logout{padding:8px 20px;background:transparent;border:1px solid rgba(255,100,100,0.4);border-radius:8px;color:var(--red);font-family:'Rajdhani',sans-serif;font-size:14px;font-weight:700;letter-spacing:2px;cursor:pointer;transition:background 0.15s;}
+  .btn-logout:hover{background:rgba(255,100,100,0.08);}
+  .content{max-width:900px;margin:0 auto;padding:32px 20px;}
+  .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:32px;}
+  .stat-card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:20px;text-align:center;}
+  .stat-num{font-family:'Orbitron',monospace;font-size:28px;font-weight:900;color:var(--cyan);}
+  .stat-label{font-size:12px;color:rgba(255,255,255,0.4);letter-spacing:2px;margin-top:4px;text-transform:uppercase;}
+  .filter-bar{display:flex;gap:10px;margin-bottom:20px;flex-wrap:wrap;}
+  .filter-btn{padding:8px 18px;background:transparent;border:1px solid rgba(0,200,255,0.2);border-radius:8px;color:rgba(255,255,255,0.5);font-family:'Rajdhani',sans-serif;font-size:14px;font-weight:700;letter-spacing:1px;cursor:pointer;transition:all 0.15s;}
+  .filter-btn.active,.filter-btn:hover{border-color:var(--cyan);color:var(--cyan);background:rgba(0,200,255,0.06);}
+  .section-title{font-family:'Orbitron',monospace;font-size:14px;font-weight:700;color:var(--cyan);letter-spacing:4px;margin-bottom:16px;}
+  .order-card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:20px 24px;margin-bottom:14px;position:relative;overflow:hidden;transition:border-color 0.2s;}
+  .order-card:hover{border-color:rgba(0,200,255,0.3);}
+  .order-card::before{content:'';position:absolute;left:0;top:0;bottom:0;width:4px;border-radius:4px 0 0 4px;}
+  .order-card.pending::before{background:var(--yellow);}
+  .order-card.confirmed::before{background:var(--green);}
+  .order-card.done::before{background:var(--cyan);}
+  .order-card.cancelled::before{background:var(--red);}
+  .order-header{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:14px;flex-wrap:wrap;}
+  .order-id{font-family:'Orbitron',monospace;font-size:12px;color:rgba(255,255,255,0.35);letter-spacing:2px;}
+  .order-name{font-size:20px;font-weight:700;color:#fff;margin-top:2px;}
+  .badge{padding:4px 14px;border-radius:20px;font-size:12px;font-weight:700;letter-spacing:2px;text-transform:uppercase;white-space:nowrap;}
+  .badge.pending{background:rgba(255,200,70,0.15);color:var(--yellow);border:1px solid rgba(255,200,70,0.3);}
+  .badge.confirmed{background:rgba(0,207,120,0.15);color:var(--green);border:1px solid rgba(0,207,120,0.3);}
+  .badge.done{background:rgba(0,200,255,0.15);color:var(--cyan);border:1px solid rgba(0,200,255,0.3);}
+  .badge.cancelled{background:rgba(255,100,100,0.15);color:var(--red);border:1px solid rgba(255,100,100,0.3);}
+  .order-info{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px;}
+  .info-item{font-size:14px;color:rgba(255,255,255,0.55);}
+  .info-item strong{color:rgba(255,255,255,0.85);font-weight:700;}
+  .info-catatan{font-size:14px;color:rgba(255,255,255,0.45);font-style:italic;margin-bottom:14px;}
+  .order-actions{display:flex;gap:8px;flex-wrap:wrap;}
+  .act-btn{padding:8px 16px;border-radius:8px;border:1px solid;font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:700;letter-spacing:1px;cursor:pointer;transition:all 0.15s;}
+  .act-btn:hover{transform:translateY(-1px);}
+  .act-confirm{border-color:rgba(0,207,120,0.4);color:var(--green);background:rgba(0,207,120,0.06);}
+  .act-confirm:hover{background:rgba(0,207,120,0.12);}
+  .act-done{border-color:rgba(0,200,255,0.4);color:var(--cyan);background:rgba(0,200,255,0.06);}
+  .act-done:hover{background:rgba(0,200,255,0.12);}
+  .act-cancel{border-color:rgba(255,100,100,0.4);color:var(--red);background:rgba(255,100,100,0.06);}
+  .act-cancel:hover{background:rgba(255,100,100,0.12);}
+  .act-wa{border-color:rgba(0,207,120,0.4);color:var(--green);background:rgba(0,207,120,0.06);}
+  .act-wa:hover{background:rgba(0,207,120,0.12);}
+  .act-del{border-color:rgba(255,100,100,0.2);color:rgba(255,100,100,0.5);background:transparent;}
+  .act-del:hover{border-color:rgba(255,100,100,0.5);color:var(--red);}
+  .empty{text-align:center;padding:60px 20px;color:rgba(255,255,255,0.25);font-size:16px;letter-spacing:2px;}
+  .loading{text-align:center;padding:40px;color:var(--cyan);font-size:14px;letter-spacing:3px;}
+  .toast{position:fixed;bottom:30px;left:50%;transform:translateX(-50%) translateY(20px);color:#fff;font-family:'Rajdhani',sans-serif;font-size:15px;font-weight:700;padding:12px 28px;border-radius:50px;opacity:0;transition:opacity 0.3s,transform 0.3s;pointer-events:none;z-index:999;}
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+  @media(max-width:600px){.stats{grid-template-columns:1fr 1fr;}.order-info{grid-template-columns:1fr;}}
+</style>
+</head>
+<body>
+<div id="loginScreen">
+  <div class="login-card">
+    <span class="login-bolt">⚡</span>
+    <div class="login-title">VELTR<span>XN</span> BOT</div>
+    <div class="login-sub">ADMIN DASHBOARD</div>
+    <input type="password" class="login-input" id="pwInput" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()">
+    <button class="login-btn" onclick="doLogin()">MASUK</button>
+    <div class="login-err" id="loginErr">⚠️ Password salah!</div>
+  </div>
+</div>
+
+<div id="dashboard">
+  <div class="topbar">
+    <div class="topbar-title">⚡ VELTR<span>XN</span> ADMIN</div>
+    <div>
+      <button class="btn-refresh" onclick="loadOrders()">🔄 Refresh</button>
+      <button class="btn-logout" onclick="doLogout()">LOGOUT</button>
+    </div>
+  </div>
+  <div class="content">
+    <div class="stats">
+      <div class="stat-card"><div class="stat-num" id="statTotal">-</div><div class="stat-label">Total</div></div>
+      <div class="stat-card"><div class="stat-num" id="statPending" style="color:var(--yellow)">-</div><div class="stat-label">Pending</div></div>
+      <div class="stat-card"><div class="stat-num" id="statConfirmed" style="color:var(--green)">-</div><div class="stat-label">Confirmed</div></div>
+      <div class="stat-card"><div class="stat-num" id="statDone" style="color:var(--cyan)">-</div><div class="stat-label">Selesai</div></div>
+    </div>
+    <div class="filter-bar">
+      <button class="filter-btn active" onclick="setFilter('all',this)">Semua</button>
+      <button class="filter-btn" onclick="setFilter('pending',this)">⏳ Pending</button>
+      <button class="filter-btn" onclick="setFilter('confirmed',this)">✅ Confirmed</button>
+      <button class="filter-btn" onclick="setFilter('done',this)">🎉 Selesai</button>
+      <button class="filter-btn" onclick="setFilter('cancelled',this)">❌ Cancelled</button>
+    </div>
+    <div class="section-title">📋 DAFTAR ORDER</div>
+    <div id="orderList"><div class="loading">⏳ MEMUAT DATA...</div></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+  const PASS = 'biawak12';
+  const SUPABASE_URL = 'https://ldzuqptez.supabase.co';
+  const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxkenVxcHRlemliY2hiYXh1cm9hIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc4MDEyMzA0OCwiZXhwIjoyMDk1Njk5MDQ4fQ.1aOR777azKTYrT3si9pmjVKRpquHiTElQOec0UnH_HA';
+
+  let allOrders = [], currentFilter = 'all';
+
+  function doLogin() {
+    if (document.getElementById('pwInput').value === PASS) {
+      document.getElementById('loginScreen').style.display = 'none';
+      document.getElementById('dashboard').style.display = 'block';
+      loadOrders();
+    } else {
+      document.getElementById('loginErr').style.display = 'block';
+      document.getElementById('pwInput').value = '';
+    }
+  }
+
+  function doLogout() {
+    document.getElementById('loginScreen').style.display = 'flex';
+    document.getElementById('dashboard').style.display = 'none';
+    document.getElementById('pwInput').value = '';
+  }
+
+  async function loadOrders() {
+    document.getElementById('orderList').innerHTML = '<div class="loading">⏳ MEMUAT DATA...</div>';
+    try {
+      const res = await fetch(`${SUPABASE_URL}/rest/v1/orders?order=waktu.desc`, {
+        headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
+      });
+      allOrders = await res.json();
+      updateStats();
+      renderOrders();
+    } catch(e) {
+      document.getElementById('orderList').innerHTML = '<div class="empty">❌ Gagal memuat data</div>';
+    }
+  }
+
+  function updateStats() {
+    document.getElementById('statTotal').textContent = allOrders.length;
+    document.getElementById('statPending').textContent = allOrders.filter(o=>o.status==='pending').length;
+    document.getElementById('statConfirmed').textContent = allOrders.filter(o=>o.status==='confirmed').length;
+    document.getElementById('statDone').textContent = allOrders.filter(o=>o.status==='done').length;
+  }
+
+  function setFilter(f, el) {
+    currentFilter = f;
+    document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));
+    el.classList.add('active');
+    renderOrders();
+  }
+
+  function renderOrders() {
+    const filtered = currentFilter === 'all' ? allOrders : allOrders.filter(o=>o.status===currentFilter);
+    const container = document.getElementById('orderList');
+    if (!filtered.length) { container.innerHTML = '<div class="empty">📭 Belum ada order</div>'; return; }
+    container.innerHTML = filtered.map(o => `
+      <div class="order-card ${o.status}">
+        <div class="order-header">
+          <div><div class="order-id">${o.id} • ${o.waktu}</div><div class="order-name">${o.nama}</div></div>
+          <span class="badge ${o.status}">${statusLabel(o.status)}</span>
+        </div>
+        <div class="order-info">
+          <div class="info-item">📦 Paket: <strong>${o.paket}</strong></div>
+          <div class="info-item">💰 Harga: <strong>${o.harga}</strong></div>
+          <div class="info-item">📱 WA: <strong>${o.nowa}</strong></div>
+        </div>
+        ${o.catatan!=='-'?`<div class="info-catatan">📝 ${o.catatan}</div>`:''}
+        <div class="order-actions">
+          <button class="act-btn act-wa" onclick="chatWA('${o.nowa}','${o.nama}','${o.paket}','${o.harga}','${o.id}')">💬 Chat WA</button>
+          ${o.status==='pending'?`<button class="act-btn act-confirm" onclick="updateStatus('${o.id}','confirmed')">✅ Konfirmasi</button>`:''}
+          ${o.status==='confirmed'?`<button class="act-btn act-done" onclick="updateStatus('${o.id}','done')">🎉 Selesai</button>`:''}
+          ${o.status!=='cancelled'&&o.status!=='done'?`<button class="act-btn act-cancel" onclick="updateStatus('${o.id}','cancelled')">❌ Cancel</button>`:''}
+          <button class="act-btn act-del" onclick="deleteOrder('${o.id}')">🗑️ Hapus</button>
+        </div>
+      </div>`).join('');
+  }
+
+  function statusLabel(s) {
+    return {pending:'⏳ Pending',confirmed:'✅ Confirmed',done:'🎉 Selesai',cancelled:'❌ Cancelled'}[s]||s;
+  }
+
+  async function updateStatus(id, status) {
+    try {
+      await fetch(`${SUPABASE_URL}/rest/v1/orders?id=eq.${id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type':'application/json','apikey':SUPABASE_KEY,'Authorization':`Bearer ${SUPABASE_KEY}`,'Prefer':'return=minimal' },
+        body: JSON.stringify({ status })
+      });
+      allOrders = allOrders.map(o => o.id===id ? {...o, status} : o);
+      updateStats(); renderOrders();
+      showToast('Status diupdate: ' + statusLabel(status));
+    } catch(e) { showToast('❌ Gagal update', 'rgba(255,80,80,0.95)'); }
+  }
+
+  async function deleteOrder(id) {
+    if (!confirm('Hapus order ini?')) return;
+    try {
+      await fetch(`${SUPABASE_URL}/rest/v1/orders?id=eq.${id}`, {
+        method: 'DELETE',
+        headers: { 'apikey':SUPABASE_KEY,'Authorization':`Bearer ${SUPABASE_KEY}` }
+      });
+      allOrders = allOrders.filter(o=>o.id!==id);
+      updateStats(); renderOrders();
+      showToast('🗑️ Order dihapus');
+    } catch(e) { showToast('❌ Gagal hapus', 'rgba(255,80,80,0.95)'); }
+  }
+
+  function chatWA(nowa, nama, paket, harga, id) {
+    const msg = `Halo ${nama}! Ini admin Veltrxn Bot 👋%0A%0AOrder kamu sudah kami terima:%0A• ID: ${id}%0A• Paket: ${paket} (${harga})%0A%0ASilakan transfer ke rekening berikut dan kirim bukti pembayarannya ya! 🙏`;
+    window.open(`https://wa.me/${nowa.replace(/[^0-9]/g,'')}?text=${msg}`,'_blank');
+  }
+
+  function showToast(msg, color) {
+    const t = document.getElementById('toast');
+    t.textContent = msg; t.style.background = color||'rgba(0,207,120,0.95)';
+    t.classList.add('show'); setTimeout(()=>t.classList.remove('show'), 2500);
+  }
+
+  // Auto refresh tiap 30 detik
+  setInterval(()=>{ if(document.getElementById('dashboard').style.display!=='none') loadOrders(); }, 30000);
+</script>
+</body>
+</html>

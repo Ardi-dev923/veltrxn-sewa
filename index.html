@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Veltrxn Bot — Sewa Bot WA</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Rajdhani:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root { --cyan:#00cfff;--green:#00cf78;--bg:#020408;--border:rgba(0,200,255,0.15); }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{min-height:100vh;background:var(--bg);display:flex;align-items:center;justify-content:center;font-family:'Rajdhani',sans-serif;padding:40px 20px;}
+  .card{width:100%;max-width:500px;position:relative;display:flex;flex-direction:column;align-items:center;padding:50px 36px;background:rgba(255,255,255,0.02);border:1px solid var(--border);border-radius:24px;overflow:hidden;}
+  .bg-grid{position:absolute;inset:0;background-image:linear-gradient(rgba(0,200,255,0.04) 1px,transparent 1px),linear-gradient(90deg,rgba(0,200,255,0.04) 1px,transparent 1px);background-size:40px 40px;pointer-events:none;}
+  .bg-glow{position:absolute;pointer-events:none;border-radius:50%;}
+  .bg-glow-top{top:-150px;left:50%;transform:translateX(-50%);width:500px;height:500px;background:radial-gradient(circle,rgba(0,180,255,0.15) 0%,transparent 70%);}
+  .bg-glow-bottom{bottom:-150px;left:50%;transform:translateX(-50%);width:400px;height:400px;background:radial-gradient(circle,rgba(100,0,255,0.12) 0%,transparent 70%);}
+  .header{text-align:center;margin-bottom:32px;position:relative;z-index:2;}
+  .bolt{font-size:42px;display:block;margin-bottom:6px;filter:drop-shadow(0 0 14px var(--cyan));}
+  .bot-name{font-family:'Orbitron',monospace;font-size:42px;font-weight:900;letter-spacing:4px;color:#fff;text-shadow:0 0 20px rgba(0,200,255,0.7),0 0 50px rgba(0,200,255,0.3);line-height:1;}
+  .bot-name span{color:var(--cyan);}
+  .subtitle{font-size:14px;font-weight:600;color:rgba(255,255,255,0.35);letter-spacing:6px;margin-top:8px;text-transform:uppercase;}
+  .divider{width:100%;height:1px;background:linear-gradient(to right,transparent,rgba(0,200,255,0.5),transparent);margin:8px 0 28px;position:relative;z-index:2;}
+  .pricing-wrapper{width:100%;display:flex;flex-direction:column;gap:22px;position:relative;z-index:2;}
+  .section-label{display:flex;align-items:center;gap:10px;margin-bottom:10px;}
+  .section-label .icon{font-size:20px;}
+  .section-label .title{font-family:'Orbitron',monospace;font-size:13px;font-weight:700;color:var(--cyan);letter-spacing:4px;}
+  .section-label .line{flex:1;height:1px;background:linear-gradient(to right,rgba(0,200,255,0.35),transparent);}
+  .price-row{display:flex;align-items:center;justify-content:space-between;padding:12px 18px;background:rgba(0,200,255,0.04);border:1px solid rgba(0,200,255,0.1);border-radius:10px;margin-bottom:7px;position:relative;overflow:hidden;cursor:pointer;transition:background 0.2s,border-color 0.2s;}
+  .price-row::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--cyan);border-radius:3px 0 0 3px;}
+  .price-row:hover,.price-row.selected{background:rgba(0,200,255,0.12);border-color:rgba(0,200,255,0.4);}
+  .price-row.selected::after{content:'✓';position:absolute;right:18px;color:var(--cyan);font-size:18px;font-weight:900;}
+  .price-row .duration{font-size:17px;font-weight:700;color:rgba(255,255,255,0.85);}
+  .price-row .dots{flex:1;border-bottom:2px dotted rgba(255,255,255,0.1);margin:0 12px;}
+  .price-row .price{font-family:'Orbitron',monospace;font-size:16px;font-weight:700;color:var(--cyan);text-shadow:0 0 8px rgba(0,200,255,0.5);margin-right:28px;}
+  .features{width:100%;position:relative;z-index:2;margin-top:6px;}
+  .features-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+  .feature-item{display:flex;align-items:center;gap:8px;padding:10px 14px;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.06);border-radius:8px;font-size:14px;font-weight:600;color:rgba(255,255,255,0.7);}
+  .order-form{width:100%;position:relative;z-index:2;margin-top:28px;}
+  .form-title{font-family:'Orbitron',monospace;font-size:14px;font-weight:700;color:var(--cyan);letter-spacing:3px;margin-bottom:16px;text-align:center;}
+  .form-group{margin-bottom:14px;}
+  .form-group label{display:block;font-size:13px;font-weight:600;color:rgba(255,255,255,0.5);letter-spacing:2px;text-transform:uppercase;margin-bottom:6px;}
+  .form-group input,.form-group textarea{width:100%;padding:13px 16px;background:rgba(255,255,255,0.03);border:1px solid rgba(0,200,255,0.2);border-radius:10px;color:#fff;font-family:'Rajdhani',sans-serif;font-size:16px;font-weight:600;outline:none;transition:border-color 0.2s;}
+  .form-group input:focus,.form-group textarea:focus{border-color:var(--cyan);}
+  .form-group textarea{resize:none;height:80px;}
+  .selected-pkg{padding:12px 16px;background:rgba(0,200,255,0.08);border:1px solid rgba(0,200,255,0.3);border-radius:10px;color:var(--cyan);font-size:15px;font-weight:700;font-family:'Orbitron',monospace;letter-spacing:1px;min-height:44px;}
+  .btn-group{width:100%;display:flex;flex-direction:column;gap:12px;position:relative;z-index:2;margin-top:24px;}
+  .btn-order{display:flex;align-items:center;justify-content:center;gap:12px;padding:18px;background:linear-gradient(135deg,#00cf78,#00a65e);border:none;border-radius:14px;font-family:'Orbitron',monospace;font-size:15px;font-weight:700;color:#fff;letter-spacing:2px;cursor:pointer;box-shadow:0 4px 24px rgba(0,207,120,0.35);transition:transform 0.15s,box-shadow 0.15s;}
+  .btn-order:hover{transform:translateY(-2px);box-shadow:0 8px 32px rgba(0,207,120,0.45);}
+  .btn-order:disabled{opacity:0.6;cursor:not-allowed;transform:none;}
+  .btn-copy{display:flex;align-items:center;justify-content:center;gap:12px;padding:16px;background:transparent;border:1px solid rgba(0,200,255,0.4);border-radius:14px;font-family:'Rajdhani',sans-serif;font-size:16px;font-weight:700;color:var(--cyan);letter-spacing:2px;cursor:pointer;transition:background 0.15s,transform 0.15s;}
+  .btn-copy:hover{background:rgba(0,200,255,0.08);transform:translateY(-2px);}
+  .no-perm{margin-top:20px;font-size:13px;color:rgba(255,100,100,0.65);letter-spacing:1px;position:relative;z-index:2;}
+  .no-perm span{color:rgba(255,100,100,0.9);font-weight:700;}
+  .toast{position:fixed;bottom:30px;left:50%;transform:translateX(-50%) translateY(20px);color:#fff;font-family:'Rajdhani',sans-serif;font-size:15px;font-weight:700;padding:12px 28px;border-radius:50px;opacity:0;transition:opacity 0.3s,transform 0.3s;pointer-events:none;z-index:999;}
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+  .err{color:rgba(255,100,100,0.9);font-size:13px;margin-top:4px;display:none;}
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="bg-grid"></div>
+  <div class="bg-glow bg-glow-top"></div>
+  <div class="bg-glow bg-glow-bottom"></div>
+  <div class="header">
+    <span class="bolt">⚡</span>
+    <div class="bot-name">VELTR<span>XN</span> BOT</div>
+    <div class="subtitle">Harga Sewa Resmi</div>
+  </div>
+  <div class="divider"></div>
+  <div class="pricing-wrapper">
+    <div>
+      <div class="section-label"><span class="icon">🌤️</span><span class="title">Harian</span><div class="line"></div></div>
+      <div class="price-row" onclick="selectPkg(this,'1 Hari','Rp 1.000')"><span class="duration">1 Hari</span><div class="dots"></div><span class="price">Rp 1.000</span></div>
+      <div class="price-row" onclick="selectPkg(this,'3 Hari','Rp 3.500')"><span class="duration">3 Hari</span><div class="dots"></div><span class="price">Rp 3.500</span></div>
+      <div class="price-row" onclick="selectPkg(this,'7 Hari','Rp 6.000')"><span class="duration">7 Hari</span><div class="dots"></div><span class="price">Rp 6.000</span></div>
+    </div>
+    <div>
+      <div class="section-label"><span class="icon">📆</span><span class="title">Mingguan</span><div class="line"></div></div>
+      <div class="price-row" onclick="selectPkg(this,'14 Hari','Rp 10.500')"><span class="duration">14 Hari</span><div class="dots"></div><span class="price">Rp 10.500</span></div>
+      <div class="price-row" onclick="selectPkg(this,'21 Hari','Rp 16.000')"><span class="duration">21 Hari</span><div class="dots"></div><span class="price">Rp 16.000</span></div>
+    </div>
+    <div>
+      <div class="section-label"><span class="icon">🗓️</span><span class="title">Bulanan</span><div class="line"></div></div>
+      <div class="price-row" onclick="selectPkg(this,'1 Bulan','Rp 20.000')"><span class="duration">1 Bulan</span><div class="dots"></div><span class="price">Rp 20.000</span></div>
+      <div class="price-row" onclick="selectPkg(this,'2 Bulan','Rp 35.000')"><span class="duration">2 Bulan</span><div class="dots"></div><span class="price">Rp 35.000</span></div>
+      <div class="price-row" onclick="selectPkg(this,'3 Bulan','Rp 55.000')"><span class="duration">3 Bulan</span><div class="dots"></div><span class="price">Rp 55.000</span></div>
+    </div>
+  </div>
+  <div class="divider" style="margin-top:28px;margin-bottom:20px;"></div>
+  <div class="features">
+    <div class="features-grid">
+      <div class="feature-item">✅ Aktif 24 Jam</div>
+      <div class="feature-item">⚡ Respon Cepet</div>
+      <div class="feature-item">🛡️ Jaga Grup</div>
+      <div class="feature-item">🎛️ Custom Prefix</div>
+      <div class="feature-item">📥 Download Video</div>
+      <div class="feature-item">🔥 Fitur Lengkap</div>
+    </div>
+  </div>
+  <div class="divider" style="margin-top:28px;margin-bottom:4px;"></div>
+  <div class="order-form">
+    <div class="form-title">📋 FORM ORDER</div>
+    <div class="form-group">
+      <label>Paket Dipilih</label>
+      <div class="selected-pkg" id="selectedPkg">— Pilih paket di atas dulu —</div>
+      <div class="err" id="errPkg">⚠️ Pilih paket dulu ya!</div>
+    </div>
+    <div class="form-group">
+      <label>Nama</label>
+      <input type="text" id="nama" placeholder="Nama lo...">
+      <div class="err" id="errNama">⚠️ Nama wajib diisi!</div>
+    </div>
+    <div class="form-group">
+      <label>Nomor WhatsApp</label>
+      <input type="text" id="nowa" placeholder="08xxxxxxxxxx">
+      <div class="err" id="errNowa">⚠️ Nomor WA wajib diisi!</div>
+    </div>
+    <div class="form-group">
+      <label>Catatan (opsional)</label>
+      <textarea id="catatan" placeholder="Ada request atau info tambahan?"></textarea>
+    </div>
+  </div>
+  <div class="btn-group">
+    <button class="btn-order" id="btnOrder" onclick="submitOrder()">🚀 Order Sekarang</button>
+    <button class="btn-copy" onclick="copyNumber()">📋 Copy Nomor WA Admin</button>
+  </div>
+  <div class="no-perm">⚠️ <span>Tidak tersedia</span> sewa permanen</div>
+</div>
+<div class="toast" id="toast"></div>
+<script>
+  const SUPABASE_URL = 'https://ldzuqptez.supabase.co';
+  const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxkenVxcHRlemliY2hiYXh1cm9hIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc4MDEyMzA0OCwiZXhwIjoyMDk1Njk5MDQ4fQ.1aOR777azKTYrT3si9pmjVKRpquHiTElQOec0UnH_HA';
+
+  let selectedPaket = '', selectedHarga = '';
+
+  function selectPkg(el, paket, harga) {
+    document.querySelectorAll('.price-row').forEach(r => r.classList.remove('selected'));
+    el.classList.add('selected');
+    selectedPaket = paket; selectedHarga = harga;
+    document.getElementById('selectedPkg').textContent = paket + ' — ' + harga;
+    document.getElementById('errPkg').style.display = 'none';
+  }
+
+  function showToast(msg, color) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.style.background = color || 'rgba(0,207,120,0.95)';
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 3000);
+  }
+
+  async function submitOrder() {
+    let valid = true;
+    if (!selectedPaket) { document.getElementById('errPkg').style.display = 'block'; valid = false; }
+    const nama = document.getElementById('nama').value.trim();
+    const nowa = document.getElementById('nowa').value.trim();
+    const catatan = document.getElementById('catatan').value.trim();
+    if (!nama) { document.getElementById('errNama').style.display = 'block'; valid = false; } else { document.getElementById('errNama').style.display = 'none'; }
+    if (!nowa) { document.getElementById('errNowa').style.display = 'block'; valid = false; } else { document.getElementById('errNowa').style.display = 'none'; }
+    if (!valid) return;
+
+    const btn = document.getElementById('btnOrder');
+    btn.disabled = true;
+    btn.textContent = '⏳ Mengirim...';
+
+    const order = {
+      id: 'ORD-' + Date.now(),
+      nama, nowa,
+      paket: selectedPaket,
+      harga: selectedHarga,
+      catatan: catatan || '-',
+      waktu: new Date().toLocaleString('id-ID'),
+      status: 'pending'
+    };
+
+    try {
+      const res = await fetch(`${SUPABASE_URL}/rest/v1/orders`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'apikey': SUPABASE_KEY,
+          'Authorization': `Bearer ${SUPABASE_KEY}`,
+          'Prefer': 'return=minimal'
+        },
+        body: JSON.stringify(order)
+      });
+
+      if (!res.ok) throw new Error('Gagal');
+
+      showToast('✅ Order berhasil! Mengarahkan ke WA...');
+      const msg = `Halo kak, mau sewa Veltrxn Bot!%0A%0A📋 *Detail Order*%0A• ID: ${order.id}%0A• Nama: ${nama}%0A• No WA: ${nowa}%0A• Paket: ${selectedPaket} (${selectedHarga})%0A• Catatan: ${catatan || '-'}%0A%0AMohon konfirmasi pembayarannya ya kak 🙏`;
+      setTimeout(() => window.open(`https://wa.me/6285198037092?text=${msg}`, '_blank'), 1200);
+    } catch(e) {
+      showToast('❌ Gagal kirim order, coba lagi!', 'rgba(255,80,80,0.95)');
+    }
+
+    btn.disabled = false;
+    btn.textContent = '🚀 Order Sekarang';
+  }
+
+  function copyNumber() {
+    navigator.clipboard.writeText('6285198037092').then(() => showToast('✅ Nomor berhasil dicopy!'));
+  }
+</script>
+</body>
+</html>
