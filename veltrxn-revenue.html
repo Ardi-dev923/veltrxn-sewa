@@ -465,13 +465,14 @@
 
 <script>
   const SUPABASE_URL = "https://ldzuqptezibchbaxuroa.supabase.co";
-  const SUPABASE_ANON_KEY = "GANTI_DENGAN_SUPABASE_ANON_KEY_KAMU";
+  const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxkenVxcHRlemliY2hiYXh1cm9hIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAxMjMwNDgsImV4cCI6MjA5NTY5OTA0OH0.esp4FWP5T-YeFyMKBPwrORysYZygzyzX78REvwLdzJA";
 
   let allOrders = [];
   let chart = null;
   let currentFilter = 'minggu';
 
   async function fetchOrders() {
+    try {
     const res = await fetch(`${SUPABASE_URL}/rest/v1/orders?select=*&order=created_at.desc`, {
       headers: {
         apikey: SUPABASE_ANON_KEY,
