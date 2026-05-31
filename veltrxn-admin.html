@@ -103,15 +103,25 @@
       <div class="stat-card"><div class="stat-num" id="statConfirmed" style="color:var(--green)">-</div><div class="stat-label">Confirmed</div></div>
       <div class="stat-card"><div class="stat-num" id="statDone" style="color:var(--cyan)">-</div><div class="stat-label">Selesai</div></div>
     </div>
-    <div class="filter-bar">
-      <button class="filter-btn active" onclick="setFilter('all',this)">Semua</button>
-      <button class="filter-btn" onclick="setFilter('pending',this)">⏳ Pending</button>
-      <button class="filter-btn" onclick="setFilter('confirmed',this)">✅ Confirmed</button>
-      <button class="filter-btn" onclick="setFilter('done',this)">🎉 Selesai</button>
-      <button class="filter-btn" onclick="setFilter('cancelled',this)">❌ Cancelled</button>
+    <div class="filter-bar" style="margin-bottom:8px;">
+      <button class="filter-btn active" onclick="setTab('orders',this)">📋 Orders</button>
+      <button class="filter-btn" onclick="setTab('testimoni',this)">⭐ Testimoni</button>
     </div>
-    <div class="section-title">📋 DAFTAR ORDER</div>
-    <div id="orderList"><div class="loading">⏳ MEMUAT DATA...</div></div>
+    <div id="tabOrders">
+      <div class="filter-bar">
+        <button class="filter-btn active" onclick="setFilter('all',this)">Semua</button>
+        <button class="filter-btn" onclick="setFilter('pending',this)">⏳ Pending</button>
+        <button class="filter-btn" onclick="setFilter('confirmed',this)">✅ Confirmed</button>
+        <button class="filter-btn" onclick="setFilter('done',this)">🎉 Selesai</button>
+        <button class="filter-btn" onclick="setFilter('cancelled',this)">❌ Cancelled</button>
+      </div>
+      <div class="section-title">📋 DAFTAR ORDER</div>
+      <div id="orderList"><div class="loading">⏳ MEMUAT DATA...</div></div>
+    </div>
+    <div id="tabTestimoni" style="display:none;">
+      <div class="section-title">⭐ TESTIMONI PENDING</div>
+      <div id="testiList"><div class="loading">⏳ MEMUAT DATA...</div></div>
+    </div>
   </div>
 </div>
 
@@ -234,6 +244,64 @@
     const t = document.getElementById('toast');
     t.textContent = msg; t.style.background = color||'rgba(0,207,120,0.95)';
     t.classList.add('show'); setTimeout(()=>t.classList.remove('show'), 2500);
+  }
+
+  function setTab(tab, el) {
+    document.querySelectorAll('.filter-bar:first-child .filter-btn').forEach(b=>b.classList.remove('active'));
+    el.classList.add('active');
+    document.getElementById('tabOrders').style.display = tab==='orders' ? 'block' : 'none';
+    document.getElementById('tabTestimoni').style.display = tab==='testimoni' ? 'block' : 'none';
+    if (tab==='testimoni') loadTestimoni();
+  }
+
+  async function loadTestimoni() {
+    document.getElementById('testiList').innerHTML = '<div class="loading">⏳ MEMUAT DATA...</div>';
+    try {
+      const res = await fetch(`${SUPABASE_URL}/rest/v1/testimoni?order=waktu.desc`, {
+        headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
+      });
+      const data = await res.json();
+      const container = document.getElementById('testiList');
+      if (!data.length) { container.innerHTML = '<div class="empty">📭 Belum ada testimoni</div>'; return; }
+      container.innerHTML = data.map(t => `
+        <div class="order-card" style="border-left:4px solid ${t.status==='approved'?'var(--green)':t.status==='rejected'?'var(--red)':'var(--yellow)'}">
+          <div class="order-header">
+            <div>
+              <div class="order-id">${t.id} • ${t.waktu}</div>
+              <div class="order-name">${t.nama} ${'⭐'.repeat(t.rating)}</div>
+            </div>
+            <span class="badge ${t.status==='approved'?'confirmed':t.status==='rejected'?'cancelled':'pending'}">${t.status==='approved'?'✅ Approved':t.status==='rejected'?'❌ Rejected':'⏳ Pending'}</span>
+          </div>
+          <div style="font-size:15px;color:rgba(255,255,255,0.65);margin-bottom:14px;">"${t.review}"</div>
+          <div class="order-actions">
+            ${t.status!=='approved'?`<button class="act-btn act-confirm" onclick="updateTesti('${t.id}','approved')">✅ Approve</button>`:''}
+            ${t.status!=='rejected'?`<button class="act-btn act-cancel" onclick="updateTesti('${t.id}','rejected')">❌ Reject</button>`:''}
+            <button class="act-btn act-del" onclick="deleteTesti('${t.id}')">🗑️ Hapus</button>
+          </div>
+        </div>`).join('');
+    } catch(e) {
+      document.getElementById('testiList').innerHTML = '<div class="empty">❌ Gagal memuat</div>';
+    }
+  }
+
+  async function updateTesti(id, status) {
+    await fetch(`${SUPABASE_URL}/rest/v1/testimoni?id=eq.${id}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type':'application/json','apikey':SUPABASE_KEY,'Authorization':`Bearer ${SUPABASE_KEY}`,'Prefer':'return=minimal' },
+      body: JSON.stringify({ status })
+    });
+    showToast(status==='approved'?'✅ Testimoni diapprove!':'❌ Testimoni direject!');
+    loadTestimoni();
+  }
+
+  async function deleteTesti(id) {
+    if (!confirm('Hapus testimoni ini?')) return;
+    await fetch(`${SUPABASE_URL}/rest/v1/testimoni?id=eq.${id}`, {
+      method: 'DELETE',
+      headers: { 'apikey':SUPABASE_KEY,'Authorization':`Bearer ${SUPABASE_KEY}` }
+    });
+    showToast('🗑️ Testimoni dihapus');
+    loadTestimoni();
   }
 
   // Auto refresh tiap 30 detik
