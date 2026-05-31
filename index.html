@@ -21,6 +21,9 @@
   .bot-name span{color:var(--cyan);}
   .subtitle{font-size:14px;font-weight:600;color:rgba(255,255,255,0.35);letter-spacing:6px;margin-top:8px;text-transform:uppercase;}
   .divider{width:100%;height:1px;background:linear-gradient(to right,transparent,rgba(0,200,255,0.5),transparent);margin:8px 0 28px;position:relative;z-index:2;}
+  .nav{display:flex;gap:8px;margin-bottom:8px;flex-wrap:wrap;position:relative;z-index:2;justify-content:center;}
+  .nav a{padding:7px 14px;border:1px solid rgba(0,200,255,0.2);border-radius:8px;color:rgba(255,255,255,0.5);font-size:12px;font-weight:700;text-decoration:none;transition:all 0.15s;}
+  .nav a:hover,.nav a.active{border-color:var(--cyan);color:var(--cyan);background:rgba(0,200,255,0.06);}
   .pricing-wrapper{width:100%;display:flex;flex-direction:column;gap:22px;position:relative;z-index:2;}
   .section-label{display:flex;align-items:center;gap:10px;margin-bottom:10px;}
   .section-label .icon{font-size:20px;}
@@ -44,6 +47,14 @@
   .form-group input:focus,.form-group textarea:focus{border-color:var(--cyan);}
   .form-group textarea{resize:none;height:80px;}
   .selected-pkg{padding:12px 16px;background:rgba(0,200,255,0.08);border:1px solid rgba(0,200,255,0.3);border-radius:10px;color:var(--cyan);font-size:15px;font-weight:700;font-family:'Orbitron',monospace;letter-spacing:1px;min-height:44px;}
+  .voucher-row{display:flex;gap:8px;}
+  .voucher-row input{flex:1;}
+  .btn-voucher{padding:13px 16px;background:transparent;border:1px solid rgba(0,200,255,0.3);border-radius:10px;color:var(--cyan);font-family:'Rajdhani',sans-serif;font-size:14px;font-weight:700;cursor:pointer;white-space:nowrap;transition:background 0.15s;}
+  .btn-voucher:hover{background:rgba(0,200,255,0.08);}
+  .voucher-info{font-size:13px;margin-top:4px;}
+  .voucher-ok{color:var(--green);}
+  .voucher-err{color:#ff6464;}
+  .harga-final{padding:10px 16px;background:rgba(0,207,120,0.08);border:1px solid rgba(0,207,120,0.2);border-radius:10px;color:var(--green);font-family:'Orbitron',monospace;font-size:14px;font-weight:700;margin-top:8px;display:none;}
   .btn-group{width:100%;display:flex;flex-direction:column;gap:12px;position:relative;z-index:2;margin-top:24px;}
   .btn-order{display:flex;align-items:center;justify-content:center;gap:12px;padding:18px;background:linear-gradient(135deg,#00cf78,#00a65e);border:none;border-radius:14px;font-family:'Orbitron',monospace;font-size:15px;font-weight:700;color:#fff;letter-spacing:2px;cursor:pointer;box-shadow:0 4px 24px rgba(0,207,120,0.35);transition:transform 0.15s,box-shadow 0.15s;}
   .btn-order:hover{transform:translateY(-2px);box-shadow:0 8px 32px rgba(0,207,120,0.45);}
@@ -67,24 +78,33 @@
     <div class="bot-name">VELTR<span>XN</span> BOT</div>
     <div class="subtitle">Harga Sewa Resmi</div>
   </div>
+  <div class="nav">
+    <a href="/" class="active">🏠 Home</a>
+    <a href="/cek-order.html">🔍 Cek Order</a>
+    <a href="/testimoni.html">⭐ Testimoni</a>
+  </div>
   <div class="divider"></div>
   <div class="pricing-wrapper">
     <div>
       <div class="section-label"><span class="icon">🌤️</span><span class="title">Harian</span><div class="line"></div></div>
-      <div class="price-row" onclick="selectPkg(this,'1 Hari','Rp 1.000')"><span class="duration">1 Hari</span><div class="dots"></div><span class="price">Rp 1.000</span></div>
-      <div class="price-row" onclick="selectPkg(this,'3 Hari','Rp 3.500')"><span class="duration">3 Hari</span><div class="dots"></div><span class="price">Rp 3.500</span></div>
-      <div class="price-row" onclick="selectPkg(this,'7 Hari','Rp 6.000')"><span class="duration">7 Hari</span><div class="dots"></div><span class="price">Rp 6.000</span></div>
+      <div class="price-row" onclick="selectPkg(this,'1 Hari','Rp 1.000',1000)"><span class="duration">1 Hari</span><div class="dots"></div><span class="price">Rp 1.000</span></div>
+      <div class="price-row" onclick="selectPkg(this,'3 Hari','Rp 3.500',3500)"><span class="duration">3 Hari</span><div class="dots"></div><span class="price">Rp 3.500</span></div>
+      <div class="price-row" onclick="selectPkg(this,'7 Hari','Rp 6.000',6000)"><span class="duration">7 Hari</span><div class="dots"></div><span class="price">Rp 6.000</span></div>
     </div>
     <div>
       <div class="section-label"><span class="icon">📆</span><span class="title">Mingguan</span><div class="line"></div></div>
-      <div class="price-row" onclick="selectPkg(this,'14 Hari','Rp 10.500')"><span class="duration">14 Hari</span><div class="dots"></div><span class="price">Rp 10.500</span></div>
-      <div class="price-row" onclick="selectPkg(this,'21 Hari','Rp 16.000')"><span class="duration">21 Hari</span><div class="dots"></div><span class="price">Rp 16.000</span></div>
+      <div class="price-row" onclick="selectPkg(this,'14 Hari','Rp 10.500',10500)"><span class="duration">14 Hari</span><div class="dots"></div><span class="price">Rp 10.500</span></div>
+      <div class="price-row" onclick="selectPkg(this,'21 Hari','Rp 16.000',16000)"><span class="duration">21 Hari</span><div class="dots"></div><span class="price">Rp 16.000</span></div>
     </div>
     <div>
       <div class="section-label"><span class="icon">🗓️</span><span class="title">Bulanan</span><div class="line"></div></div>
-      <div class="price-row" onclick="selectPkg(this,'1 Bulan','Rp 20.000')"><span class="duration">1 Bulan</span><div class="dots"></div><span class="price">Rp 20.000</span></div>
-      <div class="price-row" onclick="selectPkg(this,'2 Bulan','Rp 35.000')"><span class="duration">2 Bulan</span><div class="dots"></div><span class="price">Rp 35.000</span></div>
-      <div class="price-row" onclick="selectPkg(this,'3 Bulan','Rp 55.000')"><span class="duration">3 Bulan</span><div class="dots"></div><span class="price">Rp 55.000</span></div>
+      <div class="price-row" onclick="selectPkg(this,'1 Bulan','Rp 20.000',20000)"><span class="duration">1 Bulan</span><div class="dots"></div><span class="price">Rp 20.000</span></div>
+      <div class="price-row" onclick="selectPkg(this,'2 Bulan','Rp 35.000',35000)"><span class="duration">2 Bulan</span><div class="dots"></div><span class="price">Rp 35.000</span></div>
+      <div class="price-row" onclick="selectPkg(this,'3 Bulan','Rp 55.000',55000)"><span class="duration">3 Bulan</span><div class="dots"></div><span class="price">Rp 55.000</span></div>
+    </div>
+    <div>
+      <div class="section-label"><span class="icon">♾️</span><span class="title" style="color:#ffc846;">Permanen</span><div class="line" style="background:linear-gradient(to right,rgba(255,200,70,0.35),transparent);"></div></div>
+      <div class="price-row" onclick="selectPkg(this,'Permanen','Rp 150.000',150000)" style="border-color:rgba(255,200,70,0.2);background:rgba(255,200,70,0.04);"><span class="duration" style="color:#ffc846;">Selamanya ♾️</span><div class="dots"></div><span class="price" style="color:#ffc846;text-shadow:0 0 8px rgba(255,200,70,0.5);margin-right:28px;">Rp 150.000</span></div>
     </div>
   </div>
   <div class="divider" style="margin-top:28px;margin-bottom:20px;"></div>
@@ -117,6 +137,15 @@
       <div class="err" id="errNowa">⚠️ Nomor WA wajib diisi!</div>
     </div>
     <div class="form-group">
+      <label>Kode Voucher (opsional)</label>
+      <div class="voucher-row">
+        <input type="text" id="voucher" placeholder="Masukkan kode voucher...">
+        <button class="btn-voucher" onclick="cekVoucher()">CEK</button>
+      </div>
+      <div class="voucher-info" id="voucherInfo"></div>
+      <div class="harga-final" id="hargaFinal"></div>
+    </div>
+    <div class="form-group">
       <label>Catatan (opsional)</label>
       <textarea id="catatan" placeholder="Ada request atau info tambahan?"></textarea>
     </div>
@@ -134,63 +163,87 @@
     'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxkenVxcHRlemliY2hiYXh1cm9hIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAxMjMwNDgsImV4cCI6MjA5NTY5OTA0OH0.esp4FWP5T-YeFyMKBPwrORysYZygzyzX78REvwLdzJA'
   );
 
-  let selectedPaket = '', selectedHarga = '';
+  let selectedPaket='', selectedHarga='', selectedHargaNum=0, voucherDiskon=0, voucherKode='';
 
-  function selectPkg(el, paket, harga) {
-    document.querySelectorAll('.price-row').forEach(r => r.classList.remove('selected'));
+  function selectPkg(el, paket, harga, hargaNum) {
+    document.querySelectorAll('.price-row').forEach(r=>r.classList.remove('selected'));
     el.classList.add('selected');
-    selectedPaket = paket; selectedHarga = harga;
-    document.getElementById('selectedPkg').textContent = paket + ' — ' + harga;
-    document.getElementById('errPkg').style.display = 'none';
+    selectedPaket=paket; selectedHarga=harga; selectedHargaNum=hargaNum;
+    document.getElementById('selectedPkg').textContent=paket+' — '+harga;
+    document.getElementById('errPkg').style.display='none';
+    updateHargaFinal();
+  }
+
+  function updateHargaFinal() {
+    if (!selectedPaket || !voucherDiskon) { document.getElementById('hargaFinal').style.display='none'; return; }
+    const diskon = Math.round(selectedHargaNum * voucherDiskon / 100);
+    const final = selectedHargaNum - diskon;
+    document.getElementById('hargaFinal').style.display='block';
+    document.getElementById('hargaFinal').textContent = `💰 Harga setelah diskon: Rp ${final.toLocaleString('id-ID')} (hemat Rp ${diskon.toLocaleString('id-ID')})`;
+  }
+
+  async function cekVoucher() {
+    const kode = document.getElementById('voucher').value.trim().toUpperCase();
+    if (!kode) return;
+    const { data, error } = await db.from('voucher').select('*').eq('kode', kode).eq('aktif', true).single();
+    const info = document.getElementById('voucherInfo');
+    if (error || !data) {
+      info.className='voucher-info voucher-err';
+      info.textContent='❌ Kode voucher tidak valid!';
+      voucherDiskon=0; voucherKode='';
+    } else {
+      info.className='voucher-info voucher-ok';
+      info.textContent=`✅ Voucher valid! Diskon ${data.diskon}%`;
+      voucherDiskon=data.diskon; voucherKode=kode;
+    }
+    updateHargaFinal();
   }
 
   function showToast(msg, color) {
-    const t = document.getElementById('toast');
-    t.textContent = msg;
-    t.style.background = color || 'rgba(0,207,120,0.95)';
-    t.classList.add('show');
-    setTimeout(() => t.classList.remove('show'), 3000);
+    const t=document.getElementById('toast');
+    t.textContent=msg; t.style.background=color||'rgba(0,207,120,0.95)';
+    t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),3000);
   }
 
   async function submitOrder() {
-    let valid = true;
-    if (!selectedPaket) { document.getElementById('errPkg').style.display = 'block'; valid = false; }
-    const nama = document.getElementById('nama').value.trim();
-    const nowa = document.getElementById('nowa').value.trim();
-    const catatan = document.getElementById('catatan').value.trim();
-    if (!nama) { document.getElementById('errNama').style.display = 'block'; valid = false; } else { document.getElementById('errNama').style.display = 'none'; }
-    if (!nowa) { document.getElementById('errNowa').style.display = 'block'; valid = false; } else { document.getElementById('errNowa').style.display = 'none'; }
+    let valid=true;
+    if (!selectedPaket){document.getElementById('errPkg').style.display='block';valid=false;}
+    const nama=document.getElementById('nama').value.trim();
+    const nowa=document.getElementById('nowa').value.trim();
+    const catatan=document.getElementById('catatan').value.trim();
+    if (!nama){document.getElementById('errNama').style.display='block';valid=false;}else{document.getElementById('errNama').style.display='none';}
+    if (!nowa){document.getElementById('errNowa').style.display='block';valid=false;}else{document.getElementById('errNowa').style.display='none';}
     if (!valid) return;
 
-    const btn = document.getElementById('btnOrder');
-    btn.disabled = true; btn.textContent = '⏳ Mengirim...';
+    const btn=document.getElementById('btnOrder');
+    btn.disabled=true; btn.textContent='⏳ Mengirim...';
 
-    const order = {
-      id: 'ORD-' + Date.now(),
-      nama, nowa,
-      paket: selectedPaket,
-      harga: selectedHarga,
-      catatan: catatan || '-',
-      waktu: new Date().toLocaleString('id-ID'),
-      status: 'pending'
+    const diskon=voucherDiskon?Math.round(selectedHargaNum*voucherDiskon/100):0;
+    const hargaFinal=selectedHargaNum-diskon;
+
+    const order={
+      id:'ORD-'+Date.now(), nama, nowa,
+      paket:selectedPaket,
+      harga: diskon ? `Rp ${hargaFinal.toLocaleString('id-ID')} (diskon ${voucherDiskon}%)` : selectedHarga,
+      catatan:catatan||'-',
+      waktu:new Date().toLocaleString('id-ID'),
+      status:'pending'
     };
 
-    const { error } = await db.from('orders').insert([order]);
+    const {error}=await db.from('orders').insert([order]);
 
     if (error) {
-      console.error(error);
-      showToast('❌ Gagal: ' + error.message, 'rgba(255,80,80,0.95)');
+      showToast('❌ Gagal: '+error.message,'rgba(255,80,80,0.95)');
     } else {
       showToast('✅ Order berhasil! Mengarahkan ke WA...');
-      const msg = `Halo kak, mau sewa Veltrxn Bot!%0A%0A📋 *Detail Order*%0A• ID: ${order.id}%0A• Nama: ${nama}%0A• No WA: ${nowa}%0A• Paket: ${selectedPaket} (${selectedHarga})%0A• Catatan: ${catatan || '-'}%0A%0AMohon konfirmasi pembayarannya ya kak 🙏`;
-      setTimeout(() => window.open(`https://wa.me/6285198037092?text=${msg}`, '_blank'), 1200);
+      const msg=`Halo kak, mau sewa Veltrxn Bot!%0A%0A📋 *Detail Order*%0A• ID: ${order.id}%0A• Nama: ${nama}%0A• No WA: ${nowa}%0A• Paket: ${selectedPaket}%0A• Harga: ${order.harga}%0A• Catatan: ${catatan||'-'}%0A%0AMohon konfirmasi pembayarannya ya kak 🙏`;
+      setTimeout(()=>window.open(`https://wa.me/6285198037092?text=${msg}`,'_blank'),1200);
     }
-
-    btn.disabled = false; btn.textContent = '🚀 Order Sekarang';
+    btn.disabled=false; btn.textContent='🚀 Order Sekarang';
   }
 
   function copyNumber() {
-    navigator.clipboard.writeText('6285198037092').then(() => showToast('✅ Nomor berhasil dicopy!'));
+    navigator.clipboard.writeText('6285198037092').then(()=>showToast('✅ Nomor berhasil dicopy!'));
   }
 </script>
 </body>
