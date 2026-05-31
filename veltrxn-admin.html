@@ -93,6 +93,7 @@
     <div class="topbar-title">⚡ VELTR<span>XN</span> ADMIN</div>
     <div>
       <button class="btn-refresh" onclick="loadOrders()">🔄 Refresh</button>
+      <a href="veltrxn-revenue.html" style="padding:8px 16px;background:rgba(0,207,120,0.1);border:1px solid rgba(0,207,120,0.3);border-radius:8px;color:#00cf78;font-family:'Rajdhani',sans-serif;font-size:14px;font-weight:700;text-decoration:none;margin-right:8px;">📊 Pendapatan</a>
       <button class="btn-logout" onclick="doLogout()">LOGOUT</button>
     </div>
   </div>
@@ -154,7 +155,7 @@
   async function loadOrders() {
     document.getElementById('orderList').innerHTML = '<div class="loading">⏳ MEMUAT DATA...</div>';
     try {
-      const res = await fetch(`${SUPABASE_URL}/rest/v1/orders?order=waktu.desc`, {
+      const res = await fetch(`${SUPABASE_URL}/rest/v1/orders?order=created_at.desc`, {
         headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
       });
       allOrders = await res.json();
@@ -192,6 +193,8 @@
         <div class="order-info">
           <div class="info-item">📦 Paket: <strong>${o.paket}</strong></div>
           <div class="info-item">💰 Harga: <strong>${o.harga}</strong></div>
+          <div class="info-item">📅 Mulai: <strong>${o.tanggal_mulai||'-'}</strong></div>
+          <div class="info-item">📅 Selesai: <strong>${o.tanggal_selesai ? '<span style="color:'+( new Date(o.tanggal_selesai) - new Date() < 86400000*2 ? 'var(--red)' : 'inherit' )+'">'+o.tanggal_selesai+'</span>' : '-'}</strong></div>
           <div class="info-item">📱 WA: <strong>${o.nowa}</strong></div>
         </div>
         ${o.catatan!=='-'?`<div class="info-catatan">📝 ${o.catatan}</div>`:''}

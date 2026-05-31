@@ -146,6 +146,11 @@
       <div class="harga-final" id="hargaFinal"></div>
     </div>
     <div class="form-group">
+      <label>Tanggal Mulai Sewa</label>
+      <input type="date" id="tanggalMulai">
+      <div class="err" id="errTanggal">⚠️ Tanggal mulai wajib diisi!</div>
+    </div>
+    <div class="form-group">
       <label>Catatan (opsional)</label>
       <textarea id="catatan" placeholder="Ada request atau info tambahan?"></textarea>
     </div>
@@ -205,14 +210,42 @@
     t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),3000);
   }
 
+  // Hitung tanggal selesai otomatis berdasarkan paket
+  function hitungTanggalSelesai(mulai, paket) {
+    const d = new Date(mulai);
+    const p = paket.toLowerCase();
+    if (p.includes('1 hari')) d.setDate(d.getDate()+1);
+    else if (p.includes('3 hari')) d.setDate(d.getDate()+3);
+    else if (p.includes('7 hari')) d.setDate(d.getDate()+7);
+    else if (p.includes('14 hari')) d.setDate(d.getDate()+14);
+    else if (p.includes('21 hari')) d.setDate(d.getDate()+21);
+    else if (p.includes('1 bulan')) d.setMonth(d.getMonth()+1);
+    else if (p.includes('2 bulan')) d.setMonth(d.getMonth()+2);
+    else if (p.includes('3 bulan')) d.setMonth(d.getMonth()+3);
+    else if (p.includes('permanen')) return null;
+    return d.toISOString().split('T')[0];
+  }
+
+  async function kirimNotifTelegram(order) {
+    try {
+      await fetch('/.netlify/functions/notify-telegram', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(order),
+      });
+    } catch(e) { console.warn('Notif Telegram gagal:', e); }
+  }
+
   async function submitOrder() {
     let valid=true;
     if (!selectedPaket){document.getElementById('errPkg').style.display='block';valid=false;}
     const nama=document.getElementById('nama').value.trim();
     const nowa=document.getElementById('nowa').value.trim();
     const catatan=document.getElementById('catatan').value.trim();
+    const tanggalMulai=document.getElementById('tanggalMulai').value;
     if (!nama){document.getElementById('errNama').style.display='block';valid=false;}else{document.getElementById('errNama').style.display='none';}
     if (!nowa){document.getElementById('errNowa').style.display='block';valid=false;}else{document.getElementById('errNowa').style.display='none';}
+    if (!tanggalMulai){document.getElementById('errTanggal').style.display='block';valid=false;}else{document.getElementById('errTanggal').style.display='none';}
     if (!valid) return;
 
     const btn=document.getElementById('btnOrder');
@@ -220,6 +253,7 @@
 
     const diskon=voucherDiskon?Math.round(selectedHargaNum*voucherDiskon/100):0;
     const hargaFinal=selectedHargaNum-diskon;
+    const tanggalSelesai=hitungTanggalSelesai(tanggalMulai, selectedPaket);
 
     const order={
       id:'ORD-'+Date.now(), nama, nowa,
@@ -227,7 +261,9 @@
       harga: diskon ? `Rp ${hargaFinal.toLocaleString('id-ID')} (diskon ${voucherDiskon}%)` : selectedHarga,
       catatan:catatan||'-',
       waktu:new Date().toLocaleString('id-ID'),
-      status:'pending'
+      status:'pending',
+      tanggal_mulai: tanggalMulai,
+      tanggal_selesai: tanggalSelesai,
     };
 
     const {error}=await db.from('orders').insert([order]);
@@ -235,8 +271,10 @@
     if (error) {
       showToast('❌ Gagal: '+error.message,'rgba(255,80,80,0.95)');
     } else {
+      await kirimNotifTelegram(order);
       showToast('✅ Order berhasil! Mengarahkan ke WA...');
-      const msg=`Halo kak, mau sewa Veltrxn Bot!%0A%0A📋 *Detail Order*%0A• ID: ${order.id}%0A• Nama: ${nama}%0A• No WA: ${nowa}%0A• Paket: ${selectedPaket}%0A• Harga: ${order.harga}%0A• Catatan: ${catatan||'-'}%0A%0AMohon konfirmasi pembayarannya ya kak 🙏`;
+      const tglInfo = tanggalSelesai ? `%0A• Mulai: ${tanggalMulai}%0A• Selesai: ${tanggalSelesai}` : '';
+      const msg=`Halo kak, mau sewa Veltrxn Bot!%0A%0A📋 *Detail Order*%0A• ID: ${order.id}%0A• Nama: ${nama}%0A• No WA: ${nowa}%0A• Paket: ${selectedPaket}%0A• Harga: ${order.harga}${tglInfo}%0A• Catatan: ${catatan||'-'}%0A%0AMohon konfirmasi pembayarannya ya kak 🙏`;
       setTimeout(()=>window.open(`https://wa.me/6285198037092?text=${msg}`,'_blank'),1200);
     }
     btn.disabled=false; btn.textContent='🚀 Order Sekarang';
