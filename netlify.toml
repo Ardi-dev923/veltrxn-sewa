@@ -1,0 +1,9 @@
+[build]
+  functions = "netlify/functions"
+
+# Cron pengingat H-1 — jalan tiap hari jam 08.00 WIB (01.00 UTC)
+[[plugins]]
+  package = "@netlify/plugin-functions-install-core"
+
+[functions."reminder-h1"]
+  schedule = "0 1 * * *"
