@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cek Order — Veltrxn Bot</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Rajdhani:wght@400;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+  :root{--cyan:#00cfff;--green:#00cf78;--yellow:#ffc846;--red:#ff6464;--bg:#020408;--border:rgba(0,200,255,0.15);}
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{min-height:100vh;background:var(--bg);font-family:'Rajdhani',sans-serif;color:#fff;padding:40px 20px;}
+  .container{max-width:500px;margin:0 auto;}
+  .header{text-align:center;margin-bottom:40px;}
+  .bolt{font-size:36px;display:block;filter:drop-shadow(0 0 14px var(--cyan));}
+  .bot-name{font-family:'Orbitron',monospace;font-size:32px;font-weight:900;letter-spacing:4px;color:#fff;text-shadow:0 0 20px rgba(0,200,255,0.7);}
+  .bot-name span{color:var(--cyan);}
+  .subtitle{font-size:13px;color:rgba(255,255,255,0.35);letter-spacing:6px;margin-top:6px;text-transform:uppercase;}
+  .divider{width:100%;height:1px;background:linear-gradient(to right,transparent,rgba(0,200,255,0.5),transparent);margin:20px 0;}
+  .section-title{font-family:'Orbitron',monospace;font-size:14px;font-weight:700;color:var(--cyan);letter-spacing:4px;margin-bottom:16px;}
+  .search-box{display:flex;gap:10px;margin-bottom:24px;}
+  .search-input{flex:1;padding:14px 18px;background:rgba(255,255,255,0.03);border:1px solid rgba(0,200,255,0.2);border-radius:12px;color:#fff;font-family:'Rajdhani',sans-serif;font-size:16px;font-weight:600;outline:none;transition:border-color 0.2s;}
+  .search-input:focus{border-color:var(--cyan);}
+  .btn-search{padding:14px 20px;background:linear-gradient(135deg,var(--cyan),#0099cc);border:none;border-radius:12px;font-family:'Orbitron',monospace;font-size:13px;font-weight:700;color:#000;cursor:pointer;white-space:nowrap;transition:transform 0.15s;}
+  .btn-search:hover{transform:translateY(-2px);}
+  .result-card{background:rgba(255,255,255,0.02);border:1px solid var(--border);border-radius:16px;padding:24px;display:none;}
+  .result-card.show{display:block;}
+  .result-card::before{content:'';display:block;width:4px;height:100%;position:absolute;left:0;top:0;border-radius:4px 0 0 4px;}
+  .order-id{font-family:'Orbitron',monospace;font-size:12px;color:rgba(255,255,255,0.35);letter-spacing:2px;margin-bottom:4px;}
+  .order-name{font-size:22px;font-weight:700;color:#fff;margin-bottom:16px;}
+  .info-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px;}
+  .info-item{font-size:14px;color:rgba(255,255,255,0.5);}
+  .info-item strong{color:rgba(255,255,255,0.85);font-weight:700;display:block;margin-top:2px;}
+  .status-badge{display:inline-flex;align-items:center;gap:8px;padding:10px 20px;border-radius:50px;font-size:15px;font-weight:700;letter-spacing:2px;margin-top:8px;}
+  .status-badge.pending{background:rgba(255,200,70,0.15);color:var(--yellow);border:1px solid rgba(255,200,70,0.3);}
+  .status-badge.confirmed{background:rgba(0,207,120,0.15);color:var(--green);border:1px solid rgba(0,207,120,0.3);}
+  .status-badge.done{background:rgba(0,200,255,0.15);color:var(--cyan);border:1px solid rgba(0,200,255,0.3);}
+  .status-badge.cancelled{background:rgba(255,100,100,0.15);color:var(--red);border:1px solid rgba(255,100,100,0.3);}
+  .not-found{text-align:center;padding:40px;color:rgba(255,255,255,0.25);font-size:15px;}
+  .nav{display:flex;gap:8px;margin-bottom:28px;flex-wrap:wrap;}
+  .nav a{padding:8px 16px;border:1px solid rgba(0,200,255,0.2);border-radius:8px;color:rgba(255,255,255,0.5);font-size:13px;font-weight:700;text-decoration:none;transition:all 0.15s;}
+  .nav a:hover,.nav a.active{border-color:var(--cyan);color:var(--cyan);background:rgba(0,200,255,0.06);}
+  .toast{position:fixed;bottom:30px;left:50%;transform:translateX(-50%) translateY(20px);color:#fff;font-family:'Rajdhani',sans-serif;font-size:15px;font-weight:700;padding:12px 28px;border-radius:50px;opacity:0;transition:opacity 0.3s,transform 0.3s;pointer-events:none;z-index:999;}
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="header">
+    <span class="bolt">⚡</span>
+    <div class="bot-name">VELTR<span>XN</span> BOT</div>
+    <div class="subtitle">Cek Status Order</div>
+  </div>
+
+  <div class="nav">
+    <a href="/">🏠 Home</a>
+    <a href="/cek-order.html" class="active">🔍 Cek Order</a>
+    <a href="/testimoni.html">⭐ Testimoni</a>
+  </div>
+
+  <div class="divider"></div>
+
+  <div class="section-title">🔍 CEK STATUS ORDER</div>
+  <div class="search-box">
+    <input type="text" class="search-input" id="orderId" placeholder="Masukkan ID Order (ORD-xxx)" onkeydown="if(event.key==='Enter')cekOrder()">
+    <button class="btn-search" onclick="cekOrder()">CEK</button>
+  </div>
+
+  <div class="result-card" id="resultCard">
+    <div class="order-id" id="resId"></div>
+    <div class="order-name" id="resNama"></div>
+    <div class="info-grid">
+      <div class="info-item">📦 Paket<strong id="resPaket"></strong></div>
+      <div class="info-item">💰 Harga<strong id="resHarga"></strong></div>
+      <div class="info-item">📱 No WA<strong id="resNowa"></strong></div>
+      <div class="info-item">🕐 Waktu<strong id="resWaktu"></strong></div>
+    </div>
+    <div id="resStatus"></div>
+  </div>
+
+  <div class="not-found" id="notFound" style="display:none">❌ Order tidak ditemukan</div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+  const db = window.supabase.createClient(
+    'https://ldzuqptezibchbaxuroa.supabase.co',
+    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxkenVxcHRlemliY2hiYXh1cm9hIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAxMjMwNDgsImV4cCI6MjA5NTY5OTA0OH0.esp4FWP5T-YeFyMKBPwrORysYZygzyzX78REvwLdzJA'
+  );
+
+  const statusLabel = { pending:'⏳ Menunggu Konfirmasi', confirmed:'✅ Dikonfirmasi', done:'🎉 Selesai', cancelled:'❌ Dibatalkan' };
+
+  async function cekOrder() {
+    const id = document.getElementById('orderId').value.trim();
+    if (!id) return;
+
+    document.getElementById('resultCard').classList.remove('show');
+    document.getElementById('notFound').style.display = 'none';
+
+    const { data, error } = await db.from('orders').select('*').eq('id', id).single();
+
+    if (error || !data) { document.getElementById('notFound').style.display = 'block'; return; }
+
+    document.getElementById('resId').textContent = data.id;
+    document.getElementById('resNama').textContent = data.nama;
+    document.getElementById('resPaket').textContent = data.paket;
+    document.getElementById('resHarga').textContent = data.harga;
+    document.getElementById('resNowa').textContent = data.nowa;
+    document.getElementById('resWaktu').textContent = data.waktu;
+    document.getElementById('resStatus').innerHTML = `<span class="status-badge ${data.status}">${statusLabel[data.status] || data.status}</span>`;
+    document.getElementById('resultCard').classList.add('show');
+  }
+</script>
+</body>
+</html>

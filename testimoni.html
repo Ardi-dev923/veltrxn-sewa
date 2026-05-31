@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Testimoni — Veltrxn Bot</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Rajdhani:wght@400;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+  :root{--cyan:#00cfff;--green:#00cf78;--bg:#020408;--border:rgba(0,200,255,0.15);}
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{min-height:100vh;background:var(--bg);font-family:'Rajdhani',sans-serif;color:#fff;padding:40px 20px;}
+  .container{max-width:600px;margin:0 auto;}
+  .header{text-align:center;margin-bottom:40px;}
+  .bolt{font-size:36px;display:block;filter:drop-shadow(0 0 14px var(--cyan));}
+  .bot-name{font-family:'Orbitron',monospace;font-size:32px;font-weight:900;letter-spacing:4px;color:#fff;text-shadow:0 0 20px rgba(0,200,255,0.7);}
+  .bot-name span{color:var(--cyan);}
+  .subtitle{font-size:13px;color:rgba(255,255,255,0.35);letter-spacing:6px;margin-top:6px;text-transform:uppercase;}
+  .divider{width:100%;height:1px;background:linear-gradient(to right,transparent,rgba(0,200,255,0.5),transparent);margin:20px 0;}
+  .section-title{font-family:'Orbitron',monospace;font-size:14px;font-weight:700;color:var(--cyan);letter-spacing:4px;margin-bottom:16px;}
+  .form-card{background:rgba(255,255,255,0.02);border:1px solid var(--border);border-radius:16px;padding:24px;margin-bottom:32px;}
+  .form-group{margin-bottom:14px;}
+  .form-group label{display:block;font-size:13px;font-weight:600;color:rgba(255,255,255,0.5);letter-spacing:2px;text-transform:uppercase;margin-bottom:6px;}
+  .form-group input,.form-group textarea{width:100%;padding:12px 16px;background:rgba(255,255,255,0.03);border:1px solid rgba(0,200,255,0.2);border-radius:10px;color:#fff;font-family:'Rajdhani',sans-serif;font-size:16px;font-weight:600;outline:none;transition:border-color 0.2s;}
+  .form-group input:focus,.form-group textarea:focus{border-color:var(--cyan);}
+  .form-group textarea{resize:none;height:90px;}
+  .stars{display:flex;gap:8px;margin-bottom:4px;}
+  .star{font-size:28px;cursor:pointer;opacity:0.3;transition:opacity 0.15s;}
+  .star.active{opacity:1;}
+  .btn{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;padding:16px;background:linear-gradient(135deg,var(--cyan),#0099cc);border:none;border-radius:12px;font-family:'Orbitron',monospace;font-size:14px;font-weight:700;color:#000;letter-spacing:2px;cursor:pointer;transition:transform 0.15s;margin-top:8px;}
+  .btn:hover{transform:translateY(-2px);}
+  .btn:disabled{opacity:0.6;cursor:not-allowed;transform:none;}
+  .testi-card{background:rgba(255,255,255,0.02);border:1px solid var(--border);border-radius:16px;padding:20px 24px;margin-bottom:14px;position:relative;}
+  .testi-card::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--cyan);border-radius:3px 0 0 3px;}
+  .testi-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;}
+  .testi-name{font-size:18px;font-weight:700;color:#fff;}
+  .testi-stars{font-size:16px;}
+  .testi-review{font-size:15px;color:rgba(255,255,255,0.65);line-height:1.5;}
+  .testi-waktu{font-size:12px;color:rgba(255,255,255,0.25);margin-top:8px;}
+  .empty{text-align:center;padding:40px;color:rgba(255,255,255,0.25);font-size:15px;letter-spacing:2px;}
+  .loading{text-align:center;padding:30px;color:var(--cyan);font-size:13px;letter-spacing:3px;}
+  .toast{position:fixed;bottom:30px;left:50%;transform:translateX(-50%) translateY(20px);color:#fff;font-family:'Rajdhani',sans-serif;font-size:15px;font-weight:700;padding:12px 28px;border-radius:50px;opacity:0;transition:opacity 0.3s,transform 0.3s;pointer-events:none;z-index:999;}
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+  .nav{display:flex;gap:8px;margin-bottom:28px;flex-wrap:wrap;}
+  .nav a{padding:8px 16px;border:1px solid rgba(0,200,255,0.2);border-radius:8px;color:rgba(255,255,255,0.5);font-size:13px;font-weight:700;text-decoration:none;transition:all 0.15s;}
+  .nav a:hover,.nav a.active{border-color:var(--cyan);color:var(--cyan);background:rgba(0,200,255,0.06);}
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="header">
+    <span class="bolt">⚡</span>
+    <div class="bot-name">VELTR<span>XN</span> BOT</div>
+    <div class="subtitle">Testimoni Pelanggan</div>
+  </div>
+
+  <div class="nav">
+    <a href="/">🏠 Home</a>
+    <a href="/cek-order.html">🔍 Cek Order</a>
+    <a href="/testimoni.html" class="active">⭐ Testimoni</a>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- Form Submit Testimoni -->
+  <div class="section-title">✍️ TULIS TESTIMONI</div>
+  <div class="form-card">
+    <div class="form-group">
+      <label>Nama</label>
+      <input type="text" id="nama" placeholder="Nama lo...">
+    </div>
+    <div class="form-group">
+      <label>Rating</label>
+      <div class="stars" id="stars">
+        <span class="star" onclick="setRating(1)">⭐</span>
+        <span class="star" onclick="setRating(2)">⭐</span>
+        <span class="star" onclick="setRating(3)">⭐</span>
+        <span class="star" onclick="setRating(4)">⭐</span>
+        <span class="star" onclick="setRating(5)">⭐</span>
+      </div>
+    </div>
+    <div class="form-group">
+      <label>Review</label>
+      <textarea id="review" placeholder="Cerita pengalaman lo pakai Veltrxn Bot..."></textarea>
+    </div>
+    <button class="btn" id="btnSubmit" onclick="submitTesti()">⭐ Kirim Testimoni</button>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- List Testimoni -->
+  <div class="section-title">💬 TESTIMONI PELANGGAN</div>
+  <div id="testiList"><div class="loading">⏳ MEMUAT...</div></div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+  const db = window.supabase.createClient(
+    'https://ldzuqptezibchbaxuroa.supabase.co',
+    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxkenVxcHRlemliY2hiYXh1cm9hIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAxMjMwNDgsImV4cCI6MjA5NTY5OTA0OH0.esp4FWP5T-YeFyMKBPwrORysYZygzyzX78REvwLdzJA'
+  );
+
+  let rating = 0;
+
+  function setRating(r) {
+    rating = r;
+    document.querySelectorAll('.star').forEach((s,i) => s.classList.toggle('active', i < r));
+  }
+
+  function showToast(msg, color) {
+    const t = document.getElementById('toast');
+    t.textContent = msg; t.style.background = color || 'rgba(0,207,120,0.95)';
+    t.classList.add('show'); setTimeout(() => t.classList.remove('show'), 3000);
+  }
+
+  async function submitTesti() {
+    const nama = document.getElementById('nama').value.trim();
+    const review = document.getElementById('review').value.trim();
+    if (!nama || !review || !rating) { showToast('⚠️ Lengkapi semua field dulu!', 'rgba(255,150,0,0.95)'); return; }
+
+    const btn = document.getElementById('btnSubmit');
+    btn.disabled = true; btn.textContent = '⏳ Mengirim...';
+
+    const { error } = await db.from('testimoni').insert([{
+      id: 'TST-' + Date.now(), nama, rating, review,
+      waktu: new Date().toLocaleString('id-ID'), status: 'pending'
+    }]);
+
+    if (error) { showToast('❌ Gagal kirim: ' + error.message, 'rgba(255,80,80,0.95)'); }
+    else {
+      showToast('✅ Testimoni terkirim! Menunggu approval admin.');
+      document.getElementById('nama').value = '';
+      document.getElementById('review').value = '';
+      setRating(0);
+    }
+    btn.disabled = false; btn.textContent = '⭐ Kirim Testimoni';
+  }
+
+  async function loadTesti() {
+    const { data, error } = await db.from('testimoni').select('*').eq('status', 'approved').order('waktu', { ascending: false });
+    const container = document.getElementById('testiList');
+    if (error || !data?.length) { container.innerHTML = '<div class="empty">⭐ Belum ada testimoni</div>'; return; }
+    container.innerHTML = data.map(t => `
+      <div class="testi-card">
+        <div class="testi-header">
+          <div class="testi-name">${t.nama}</div>
+          <div class="testi-stars">${'⭐'.repeat(t.rating)}</div>
+        </div>
+        <div class="testi-review">"${t.review}"</div>
+        <div class="testi-waktu">${t.waktu}</div>
+      </div>
+    `).join('');
+  }
+
+  loadTesti();
+</script>
+</body>
+</html>
