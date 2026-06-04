@@ -473,7 +473,7 @@ async function doRegister(){
   }
 }
 async function doGoogle(){
-  await db.auth.signInWithOAuth({provider:'google',options:{redirectTo:location.href}});
+  await db.auth.signInWithOAuth({provider:'google',options:{redirectTo:'https://veltrxnsewa.netlify.app/'}});
 }
 async function doLogout(){
   await db.auth.signOut();
@@ -674,4 +674,3 @@ function copyNumber(event){
 </script>
 </body>
 </html>
-
